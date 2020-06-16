@@ -17,7 +17,7 @@ public class LevelOne implements Screen {
 
     @Override
     public void render(float delta) {
-
+        System.out.println("noob");
     }
 
     @Override
