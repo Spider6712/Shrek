@@ -1,6 +1,9 @@
 package com.mygdx.game.Screens;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -20,14 +23,9 @@ import com.mygdx.game.Constants;
 
 public class LevelOne implements Screen
 {
-    MyGdxGame demoGame;
-
-    private World world;
-    private Box2DDebugRenderer box2DDebugRenderer;
-
+//    private Box2DDebugRenderer box2DDebugRenderer;
 
     MyGdxGame myGame;
-    Texture myImg;
 
     private TmxMapLoader mapLoader;
     private TiledMap map;
@@ -37,30 +35,31 @@ public class LevelOne implements Screen
     private Viewport viewport;
 
 
-    public LevelOne(MyGdxGame game) {
+    public LevelOne(MyGdxGame game)
+    {
         this.myGame = game;
 
         mapLoader = new TmxMapLoader();
         map = mapLoader.load(Constants.LEVEL_MAP_FILENAME);
         renderer = new OrthogonalTiledMapRenderer(map);
-        this.demoGame = game;
 
-
-        mapLoader = new TmxMapLoader();
-        map = mapLoader.load(Constants.LEVEL_MAP_FILENAME);
-        renderer = new OrthogonalTiledMapRenderer(map);
-        this.demoGame = game;
-        world = new World(new Vector2( 0,0), true);
-
-        BodyDef bodyDef = new BodyDef();
-        PolygonShape shape = new PolygonShape();
-        FixtureDef fixtureDef = new FixtureDef();
-        Body body;
-
-        for (: map.getLayers().get(Constants.))
+//        world = new World(new Vector2( 0,0), true);
 
         camera = new OrthographicCamera();
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
+
+        camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
+
+
+//        BodyDef bodyDef = new BodyDef();
+//        PolygonShape shape = new PolygonShape();
+//        FixtureDef fixtureDef = new FixtureDef();
+//        Body body;
+
+//        for ( : map.getLayers().get(2)) {
+//
+//        }
+
     }
     @Override
     public void show()
@@ -69,33 +68,64 @@ public class LevelOne implements Screen
 
     }
 
-    @Override
-    public void render(float delta) {
+    private void update(float deltaTime)
+    {
+        camera.update();
+        renderer.setView(camera);
+    }
 
-         myGame.getBatch().begin();
-
-         myGame.getBatch().draw(myImg, 0, 0);
-
-         myGame.getBatch().end();
+    private void handleInput(float dt)
+    {
+//        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT))
+//        {
+////            camera.position.x = player.getbody.x
+//        }
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void render(float delta)
+    {
+        update(delta);
+        handleInput(delta);
+
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+//        myGame.getBatch().begin();
+//
+//        myGame.getBatch().draw(myImg, 0, 0);
+//
+
+        myGame.getBatch().setProjectionMatrix(camera.combined);
+
+//        myGame.getBatch().end();
+
+
+        renderer.render();
+    }
+
+    @Override
+    public void resize(int width, int height)
+    {
+        viewport.update(width, height);
 
     }
 
     @Override
-    public void pause() {
+    public void pause()
+    {
 
     }
 
     @Override
-    public void resume() {
+    public void resume()
+    {
 
     }
 
     @Override
-    public void hide() {
+    public void hide()
+    {
 
     }
 
