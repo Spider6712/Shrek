@@ -6,9 +6,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -34,6 +38,9 @@ public class LevelOne implements Screen
     private OrthographicCamera camera;
     private Viewport viewport;
 
+    private World world;
+    private Box2DDebugRenderer box2DDebugRenderer;
+
 
     public LevelOne(MyGdxGame game)
     {
@@ -43,7 +50,8 @@ public class LevelOne implements Screen
         map = mapLoader.load(Constants.LEVEL_MAP_FILENAME);
         renderer = new OrthogonalTiledMapRenderer(map);
 
-//        world = new World(new Vector2( 0,0), true);
+        world = new World(new Vector2( 0,0), true);
+        box2DDebugRenderer = new Box2DDebugRenderer();
 
         camera = new OrthographicCamera();
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
@@ -51,14 +59,27 @@ public class LevelOne implements Screen
         camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
 
 
-//        BodyDef bodyDef = new BodyDef();
-//        PolygonShape shape = new PolygonShape();
-//        FixtureDef fixtureDef = new FixtureDef();
-//        Body body;
+        BodyDef bodyDef = new BodyDef();
+        PolygonShape shape = new PolygonShape();
+        FixtureDef fixtureDef = new FixtureDef();
+        Body body;
 
-//        for ( : map.getLayers().get(2)) {
-//
-//        }
+        for (MapObject mapObject : map.getLayers().get(Constants.GROUND_LAYER).getObjects().getByType(PolygonMapObject.class))
+        {
+            Polygon polygon = ((PolygonMapObject)mapObject).getPolygon();
+
+            bodyDef.type = BodyDef.BodyType.StaticBody;
+            float centerX = polygon.getOriginX();
+            float centerY = polygon.getOriginY();
+            bodyDef.position.set(centerX, centerY);
+
+            body = world.createBody(bodyDef);
+
+            shape.setAsBox(polygon.getOriginX(), polygon.getOriginY());
+            fixtureDef.shape = shape;
+            body.createFixture(fixtureDef);
+
+        }
 
     }
     @Override
@@ -91,17 +112,15 @@ public class LevelOne implements Screen
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-//        myGame.getBatch().begin();
-//
-//        myGame.getBatch().draw(myImg, 0, 0);
-//
+        renderer.render();
+
+        box2DDebugRenderer.render(world, camera.combined);
+
+        myGame.getBatch().begin();
 
         myGame.getBatch().setProjectionMatrix(camera.combined);
 
-//        myGame.getBatch().end();
-
-
-        renderer.render();
+        myGame.getBatch().end();
     }
 
     @Override
